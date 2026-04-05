@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Línea del tiempo interactiva - Gestión de la calidad</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #2563eb;
+      --accent: #0f172a;
+      --soft: #dbeafe;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #1d4ed8);
+      color: white;
+      padding: 28px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 900px;
+      opacity: .96;
+    }
+
+    .hint {
+      margin-top: 14px;
+      font-size: 14px;
+      opacity: .92;
+    }
+
+    .timeline {
+      position: relative;
+      margin: 34px 0 24px;
+      padding-left: 26px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #60a5fa, #1d4ed8);
+      border-radius: 999px;
+    }
+
+    details {
+      position: relative;
+      margin: 0 0 20px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+
+    details::before {
+      content: "";
+      position: absolute;
+      left: -21px;
+      top: 28px;
+      width: 18px;
+      height: 18px;
+      background: #1d4ed8;
+      border: 4px solid #dbeafe;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 22px 18px;
+      display: grid;
+      grid-template-columns: 130px 1fr 34px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .year {
+      background: var(--soft);
+      color: #1d4ed8;
+      font-weight: 700;
+      text-align: center;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+
+    .title h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .plus {
+      font-size: 28px;
+      line-height: 1;
+      color: #1d4ed8;
+      text-align: center;
+      padding-top: 4px;
+      transition: transform .2s ease;
+    }
+
+    details[open] .plus {
+      transform: rotate(45deg);
+    }
+
+    .content {
+      padding: 0 22px 22px 166px;
+      border-top: 1px solid #eef2f7;
+      background: #fcfdff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .box h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: #1d4ed8;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .box p {
+      margin: 0;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .refs {
+      background: white;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-top: 28px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .refs h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .refs li {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      summary {
+        grid-template-columns: 1fr 30px;
+      }
+      .year {
+        grid-column: 1 / -1;
+        width: fit-content;
+      }
+      .content {
+        padding: 0 18px 18px 18px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      details::before,
+      .timeline::before {
+        display: none;
+      }
+      .timeline {
+        padding-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Línea del tiempo interactiva de las teorías y modelos de gestión de la calidad</h1>
+      <p>
+        Esta línea del tiempo resume la evolución de los enfoques más relevantes de la gestión de la calidad,
+        desde los aportes de los pioneros hasta los modelos y sistemas más utilizados en la actualidad.
+        Haz clic en cada bloque para ver autores, descripción e impacto.
+      </p>
+      <div class="hint">Contenido elaborado a partir de los tres artículos proporcionados.</div>
+    </section>
+
+    <section class="timeline">
+      <details>
+        <summary>
+          <div class="year">1950s</div>
+          <div class="title">
+            <h2>Control Estadístico de la Calidad y ciclo PDCA</h2>
+            <p>W. Edwards Deming impulsó una visión sistémica de la calidad basada en procesos, datos y mejora continua.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>W. Edwards Deming.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>Deming planteó que la calidad debía integrarse en la administración y no limitarse a inspeccionar el producto final. Su propuesta se apoya en el control estadístico de procesos y en el ciclo PHVA o PDCA: planificar, hacer, verificar y actuar. Este modelo promueve decisiones basadas en evidencia y la revisión permanente del desempeño.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Su enfoque cambió la lógica de corrección por una cultura de prevención y mejora continua. Además, abrió el camino para el desarrollo posterior de la calidad total y de múltiples sistemas modernos de gestión de calidad.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1954</div>
+          <div class="title">
+            <h2>Trilogía de Juran</h2>
+            <p>La calidad se gestiona mediante tres funciones esenciales: planificar, controlar y mejorar.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>Joseph M. Juran.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>Juran organizó la gestión de la calidad en tres procesos complementarios: planificación de la calidad, control de la calidad y mejora de la calidad. Su propuesta parte de identificar necesidades del cliente, traducirlas en procesos concretos y comparar resultados con metas establecidas. Con ello, la calidad se entiende como una tarea estratégica y directiva.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>La trilogía aportó estructura y método a la gestión de la calidad. Su legado sigue presente en sistemas que buscan ordenar la mejora desde el diseño, la operación y la evaluación de resultados.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1950s–1960s</div>
+          <div class="title">
+            <h2>Aportes de Kaoru Ishikawa</h2>
+            <p>La calidad se fortalece con trabajo en equipo, enfoque al cliente y herramientas para analizar causas de problemas.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>Kaoru Ishikawa.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>Ishikawa promovió la normalización industrial, la prevención antes que la corrección y la orientación hacia el cliente. Entre sus principales aportes destacan las siete herramientas de la calidad, como el diagrama causa-efecto, histogramas, hojas de verificación y gráficas de control. Su visión resalta que la calidad requiere participación de toda la organización.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Sus herramientas permitieron analizar fallas de forma simple y práctica. También consolidó una visión cultural de la calidad, basada en liderazgo, medición, disciplina y trabajo colectivo.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1960s</div>
+          <div class="title">
+            <h2>TQM - Total Quality Management</h2>
+            <p>La calidad total se entiende como una cultura de mejora y cambio organizacional.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>Promovido por varios pioneros; asociado en los textos a la evolución de la calidad total.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>El TQM no se limita a una herramienta estadística ni a un sistema aislado de control. Se presenta como una cultura orientada al mejoramiento continuo, la medición de la calidad, el liderazgo y el cambio organizacional. Su propósito es integrar la calidad en todas las funciones y niveles de la empresa.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Este modelo transformó la calidad en una responsabilidad compartida por toda la organización. Su influencia fue decisiva para el desarrollo de prácticas de excelencia, programas institucionales de mejora y enfoques modernos centrados en el cliente.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1960s</div>
+          <div class="title">
+            <h2>Kaizen</h2>
+            <p>La mejora continua se logra con avances pequeños y constantes en personas, procesos y resultados.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>Enfoque japonés de mejora continua; presentado en los textos como parte de la ventaja competitiva japonesa.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>Kaizen sostiene que la calidad mejora por medio de cambios graduales y permanentes. Según el texto, su enfoque pone primero la calidad de las personas y luego la de los productos, y se relaciona con el ciclo estandarizar, hacer, revisar y actuar. Es una adaptación transversal de la lógica de Deming.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Su aporte principal fue demostrar que la calidad no depende solo de grandes innovaciones, sino de la disciplina diaria. Kaizen reforzó la participación del personal y el mejoramiento continuo como base de la competitividad.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1980s</div>
+          <div class="title">
+            <h2>Gestión de la Calidad Total como era empresarial</h2>
+            <p>En los años ochenta la gestión de la calidad se consolidó como pilar central de la administración moderna.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>Juran, Deming, Crosby, Ishikawa y Feigenbaum.</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>Los artículos señalan que hacia finales de la década de 1980 se consolida la era de la gestión de la calidad. En este periodo se difundieron con más fuerza los beneficios de la gestión de la calidad total, el enfoque en el cliente y el uso más eficiente de los recursos. La calidad dejó de verse como una moda para convertirse en un eje de sostenibilidad.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Esta etapa redefinió la calidad como un tema estratégico para cualquier organización. También impulsó el desarrollo de nuevas metodologías y reforzó la relación entre calidad, productividad y competitividad.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">1990s en adelante</div>
+          <div class="title">
+            <h2>Modelo EFQM de Excelencia</h2>
+            <p>La calidad total sirve de base para modelos de excelencia orientados a la autoevaluación y la mejora continua.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>European Foundation for Quality Management (EFQM).</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>El modelo EFQM se presenta en los textos como una referencia importante para la autoevaluación organizacional y la excelencia. Se vincula con la misión, visión, valores y políticas de la empresa, y busca sostener una revisión permanente del desempeño. Su lógica se apoya en la mejora continua y en la integración de toda la organización.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>EFQM amplió la gestión de la calidad hacia una visión más integral del desempeño empresarial. Su principal valor es ayudar a diagnosticar fortalezas y oportunidades de mejora con enfoque estratégico y sostenible.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <div class="year">2015</div>
+          <div class="title">
+            <h2>ISO 9001:2015</h2>
+            <p>El sistema de gestión de calidad más utilizado a nivel mundial, orientado a procesos, satisfacción del cliente y mejora continua.</p>
+          </div>
+          <div class="plus">+</div>
+        </summary>
+        <div class="content">
+          <div class="grid">
+            <div class="box">
+              <h3>Autores principales</h3>
+              <p>International Organization for Standardization (ISO).</p>
+            </div>
+            <div class="box">
+              <h3>Descripción</h3>
+              <p>ISO 9001 se identifica en los textos como el sistema de gestión de calidad más utilizado en el mundo. Su versión 2015 refuerza el enfoque basado en procesos y la consideración de riesgos dentro de la gestión organizacional. Más que una simple certificación, funciona como una estructura formal para ordenar y mejorar el desempeño.</p>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+              <h3>Impacto o contribución</h3>
+              <p>Su implementación ha demostrado mejoras en procesos, competencias del personal, satisfacción del cliente y ventaja competitiva. Por ello, se consolidó como uno de los referentes internacionales más importantes en calidad.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="refs">
+      <h2>Referencias</h2>
+      <ol>
+        <li>Carrillo Pérez, F. X., Carrillo Pérez, V. H., &amp; Moreno Rodríguez, C. J. (2018). <i>Calidad total: Un enfoque de la administración del siglo XXI</i>. Revista Científica Mundo de la Investigación y el Conocimiento, 2(3), 634–647.</li>
+        <li>Chacón Cantos, J., &amp; Rugel Kamarova, S. (2018). <i>Teorías, modelos y sistemas de gestión de calidad</i>. Revista Espacios, 39(50), 14.</li>
+        <li>Puche, N., Velásquez, M., Núñez, Y., &amp; Rangel, H. (2021). <i>Sistemas de gestión de la calidad: una visión general desde sus inicios hasta la actualidad</i>. Revista TEKHNÉ, 24(2), 13–20.</li>
+      </ol>
+      <div class="footer-note">Generado por Moises Alvarado, curso Gestión de la cadena de suministro.</div>
+    </section>
+  </div>
+</body>
+</html>
